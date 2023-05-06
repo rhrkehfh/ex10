@@ -18,19 +18,6 @@ const MyPage = ({ history }) => {
 
     const { name, address, phone, image } = form;
 
-    const getUser = async () => {
-        setLoading(true);
-        const result = await getDoc(doc(db, 'users', sessionStorage.getItem('email')))
-        if (result.exists()) {
-            setForm(result.data());
-        }
-        setLoading(false);
-    }
-
-    useEffect(() => {
-        getUser();
-    }, []);
-
     const onChangeFile = (e) => {
         setForm({
             ...form,
@@ -44,37 +31,6 @@ const MyPage = ({ history }) => {
             ...form,
             [e.target.name]: e.target.value
         });
-    }
-
-    const onPostcode = (address) => {
-        setForm({
-            ...form,
-            address: address
-        });
-    }
-
-    const onUpdate = async () => {
-        //자동으로 ID를 생성하려면 
-        //const docRef = await addDoc(collection(store, 'users'), {form}) 
-        //console.log('Document ID:', docRef.id)
-
-        //setDoc을 사용하여 문서를 만들때 만들 문서의 ID를 지정해야 한다.
-        if (!window.confirm('회원정보를 수정하실래요?')) return;
-        setLoading(true);
-
-        if (!file) {
-            await setDoc(doc(db, 'users', sessionStorage.getItem('email')), { ...form });
-            setLoading(false);
-            history.push('/');
-        } else {
-            uploadBytes(ref(storage, `/images/${Date.now()}.jpg`), file).then(snapshot => {
-                getDownloadURL(snapshot.ref).then(async (url) => {
-                    await setDoc(doc(db, 'users', sessionStorage.getItem('email')), { ...form, image: url });
-                    setLoading(false);
-                    history.push('/');
-                });
-            });
-        }
     }
 
     if (loading) return <h1 className='my-5 text-center'>로딩중......</h1>
@@ -110,7 +66,6 @@ const MyPage = ({ history }) => {
                     </div>
                     <div className='text-center my-3'>
                         <Button
-                            onClick={onUpdate}
                             className='px-5'>정보저장</Button>
                     </div>
                 </Form>
